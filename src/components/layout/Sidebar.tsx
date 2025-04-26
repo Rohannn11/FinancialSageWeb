@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -68,29 +67,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               <NavItem to="/reports" icon={<FileText className="h-5 w-5" />} label="Reports" />
               <NavItem to="/forecasting" icon={<Calculator className="h-5 w-5" />} label="Forecasting" />
               <NavItem to="/upload" icon={<UploadCloud className="h-5 w-5" />} label="Upload Data" />
-              
-              <div className="pt-4 pb-2">
-                <div className="px-3">
-                  <h3 className="text-xs font-medium uppercase tracking-wider text-sidebar-foreground/70">
-                    AI Assistant
-                  </h3>
-                </div>
-                <div className="mt-1">
-                  <button
-                    className="flex w-full items-center px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-                    onClick={() => setShowAIChat(!showAIChat)}
-                  >
-                    <MessageSquare className="mr-3 h-5 w-5" />
-                    <span>Chat with AI</span>
-                  </button>
-                </div>
-              </div>
-              
-              {showAIChat && (
-                <div className="px-3 py-2 animate-fade-in">
-                  <AIChat />
-                </div>
-              )}
+              <NavItem to="/ai-assistant" icon={<MessageSquare className="h-5 w-5" />} label="AI Assistant" />
               
               <div className="pt-4 pb-2">
                 <div className="px-3">
