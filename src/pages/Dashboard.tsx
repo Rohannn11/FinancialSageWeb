@@ -1,11 +1,16 @@
 
-import { BarChart3, DollarSign, ArrowUp, ArrowDown, TrendingUp, AlertTriangle } from "lucide-react";
+import { BarChart3, DollarSign, ArrowUp, ArrowDown, TrendingUp, AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
+import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { ChartCard } from "@/components/dashboard/ChartCard";
+import { EnhancedChartCard } from "@/components/dashboard/EnhancedChartCard";
 import { DataTable } from "@/components/dashboard/DataTable";
+import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
+import { analyzeTrend, detectAnomalies, generateForecast } from "@/utils/dataAnalysis";
+import { useQuery } from "@tanstack/react-query";
 
-// Sample data
+// Sample data - in a real app, this would come from an API
 const revenueData = [
   { name: "Jan", value: 4000 },
   { name: "Feb", value: 3000 },
@@ -15,6 +20,18 @@ const revenueData = [
   { name: "Jun", value: 5500 },
   { name: "Jul", value: 7000 },
   { name: "Aug", value: 8000 },
+];
+
+// Previous period data for comparison
+const previousRevenueData = [
+  { name: "Jan", value: 3200 },
+  { name: "Feb", value: 2800 },
+  { name: "Mar", value: 4200 },
+  { name: "Apr", value: 3900 },
+  { name: "May", value: 5100 },
+  { name: "Jun", value: 4800 },
+  { name: "Jul", value: 6100 },
+  { name: "Aug", value: 7200 },
 ];
 
 const expenseData = [
@@ -38,6 +55,15 @@ const profitData = [
   { name: "Jul", value: 3300 },
   { name: "Aug", value: 3900 },
 ];
+
+// Enhanced data with additional insights
+const enhancedRevenueData = revenueData.map((item, index) => {
+  return {
+    ...item,
+    previous: previousRevenueData[index]?.value || 0,
+    target: item.value * 1.1, // 10% higher target
+  };
+});
 
 const anomaliesData = [
   { id: 1, date: "2023-08-15", type: "Expense", category: "Office Supplies", amount: 4500, status: "Flagged" },
@@ -92,7 +118,42 @@ const transactionColumns = [
   { key: "paymentMethod", title: "Payment Method" },
 ];
 
+// Simulate data loading
+const fetchDashboardData = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        revenue: revenueData,
+        expenses: expenseData,
+        profit: profitData,
+        anomalies: anomaliesData,
+        transactions: transactionsData,
+      });
+    }, 1000);
+  });
+};
+
 export default function Dashboard() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  // Use React Query for data fetching with cache
+  const { data, isLoading: queryLoading } = useQuery({
+    queryKey: ['dashboardData'],
+    queryFn: () => fetchDashboardData(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+  
+  // Generate forecasted data
+  const forecastData = generateForecast(revenueData, 'value', 3);
+  
+  // Generate trend analysis
+  const revenueTrend = analyzeTrend(revenueData, 'value');
+  const expenseTrend = analyzeTrend(expenseData, 'value');
+  const profitTrend = analyzeTrend(profitData, 'value');
+  
+  // Detect anomalies
+  const detectedAnomalies = detectAnomalies(revenueData, 'value');
+  
   return (
     <PageLayout>
       <div className="space-y-6">
@@ -102,28 +163,28 @@ export default function Dashboard() {
           <StatCard
             title="Total Revenue"
             value="$45,231.89"
-            description="Monthly revenue"
+            description={revenueTrend.insight}
             icon={<DollarSign className="h-4 w-4 text-primary" />}
-            trend={{ value: 12.5, isPositive: true }}
+            trend={{ value: revenueTrend.percentageChange, isPositive: revenueTrend.trend === 'increasing' }}
           />
           <StatCard
             title="Expenses"
             value="$21,350.50"
-            description="Monthly expenses"
+            description={expenseTrend.insight}
             icon={<BarChart3 className="h-4 w-4 text-destructive" />}
-            trend={{ value: 8.2, isPositive: false }}
+            trend={{ value: Math.abs(expenseTrend.percentageChange), isPositive: expenseTrend.trend !== 'increasing' }}
           />
           <StatCard
             title="Profit Margin"
             value="52.8%"
-            description="Monthly average"
+            description={profitTrend.insight}
             icon={<TrendingUp className="h-4 w-4 text-accent" />}
-            trend={{ value: 4.3, isPositive: true }}
+            trend={{ value: profitTrend.percentageChange, isPositive: profitTrend.trend === 'increasing' }}
             variant="accent"
           />
           <StatCard
             title="Anomalies"
-            value="4"
+            value={detectedAnomalies.length.toString()}
             description="Potential issues detected"
             icon={<AlertTriangle className="h-4 w-4 text-white" />}
             variant="gradient"
@@ -131,32 +192,55 @@ export default function Dashboard() {
         </div>
         
         <div className="grid gap-6 md:grid-cols-2">
-          <ChartCard
-            title="Revenue Overview"
-            description="Monthly revenue data"
-            data={revenueData}
-            dataKey="value"
-            type="area"
-            color="#3282b8"
-          />
-          <ChartCard
-            title="Expense Breakdown"
-            description="Monthly expense data"
-            data={expenseData}
-            dataKey="value"
-            type="bar"
-            color="#e24a4a"
-          />
+          {queryLoading ? (
+            <ChartSkeleton />
+          ) : (
+            <EnhancedChartCard
+              title="Revenue Overview"
+              description="Monthly revenue with comparison to previous period"
+              data={enhancedRevenueData}
+              dataKey="value"
+              type="area"
+              color="#3282b8"
+              comparisonData={{
+                label: "previous",
+                data: previousRevenueData,
+                color: "#a0aec0"
+              }}
+              forecastData={forecastData}
+              showBrush={true}
+              targetValue={8500} // Example target
+            />
+          )}
+          
+          {queryLoading ? (
+            <ChartSkeleton />
+          ) : (
+            <ChartCard
+              title="Expense Breakdown"
+              description="Monthly expense data"
+              data={expenseData}
+              dataKey="value"
+              type="bar"
+              color="#e24a4a"
+            />
+          )}
         </div>
         
-        <ChartCard
-          title="Profit Trend"
-          description="Monthly profit data"
-          data={profitData}
-          dataKey="value"
-          type="line"
-          color="#3cc47c"
-        />
+        {queryLoading ? (
+          <ChartSkeleton height={400} />
+        ) : (
+          <EnhancedChartCard
+            title="Profit Trend"
+            description="Monthly profit data with forecast"
+            data={profitData}
+            dataKey="value"
+            type="line"
+            color="#3cc47c"
+            forecastData={generateForecast(profitData, 'value', 3)}
+            allowZoom={true}
+          />
+        )}
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
           <DataTable
