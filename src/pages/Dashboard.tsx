@@ -1,4 +1,3 @@
-
 import { BarChart3, DollarSign, ArrowUp, ArrowDown, TrendingUp, AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -9,6 +8,7 @@ import { DataTable } from "@/components/dashboard/DataTable";
 import { ChartSkeleton } from "@/components/dashboard/ChartSkeleton";
 import { analyzeTrend, detectAnomalies, generateForecast } from "@/utils/dataAnalysis";
 import { useQuery } from "@tanstack/react-query";
+import { AIChat } from "@/components/ai/AIChat";
 
 // Sample data - in a real app, this would come from an API
 const revenueData = [
@@ -169,7 +169,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Expenses"
-            value="$21,350.50"
+            value={`$${expenseTrend.percentageChange.toFixed(2)}`}
             description={expenseTrend.insight}
             icon={<BarChart3 className="h-4 w-4 text-destructive" />}
             trend={{ value: Math.abs(expenseTrend.percentageChange), isPositive: expenseTrend.trend !== 'increasing' }}
@@ -189,6 +189,11 @@ export default function Dashboard() {
             icon={<AlertTriangle className="h-4 w-4 text-white" />}
             variant="gradient"
           />
+        </div>
+        
+        {/* Add Chat with AI Section */}
+        <div className="mt-8">
+          <AIChat />
         </div>
         
         <div className="grid gap-6 md:grid-cols-2">
