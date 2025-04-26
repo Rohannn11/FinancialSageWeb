@@ -1,3 +1,4 @@
+
 import { BarChart3, DollarSign, ArrowUp, ArrowDown, TrendingUp, AlertTriangle, LineChart as LineChartIcon } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -171,7 +172,7 @@ export default function Dashboard() {
             value="$70.83"
             description={expenseTrend.insight}
             icon={<BarChart3 className="h-4 w-4 text-destructive" />}
-            trend={{ value: Math.abs(expenseTrend.percentageChange).toFixed(2), isPositive: expenseTrend.trend !== 'increasing' }}
+            trend={{ value: parseFloat(Math.abs(expenseTrend.percentageChange).toFixed(2)), isPositive: expenseTrend.trend !== 'increasing' }}
             variant="secondary"
           />
           <StatCard
