@@ -11,11 +11,14 @@ import {
   Menu,
   BarChart3,
   Calculator,
-  Users
+  Users,
+  MessageSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AIChat } from "@/components/ai/AIChat";
+import { useState } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,6 +26,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
+  const [showAIChat, setShowAIChat] = useState(false);
+  
   return (
     <>
       {/* Mobile overlay */}
@@ -35,7 +40,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       
       {/* Sidebar container */}
       <div className={cn(
-        "fixed top-0 bottom-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed top-0 bottom-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex h-full flex-col">
@@ -63,6 +68,29 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
               <NavItem to="/reports" icon={<FileText className="h-5 w-5" />} label="Reports" />
               <NavItem to="/forecasting" icon={<Calculator className="h-5 w-5" />} label="Forecasting" />
               <NavItem to="/upload" icon={<UploadCloud className="h-5 w-5" />} label="Upload Data" />
+              
+              <div className="pt-4 pb-2">
+                <div className="px-3">
+                  <h3 className="text-xs font-medium uppercase tracking-wider text-sidebar-foreground/70">
+                    AI Assistant
+                  </h3>
+                </div>
+                <div className="mt-1">
+                  <button
+                    className="flex w-full items-center px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+                    onClick={() => setShowAIChat(!showAIChat)}
+                  >
+                    <MessageSquare className="mr-3 h-5 w-5" />
+                    <span>Chat with AI</span>
+                  </button>
+                </div>
+              </div>
+              
+              {showAIChat && (
+                <div className="px-3 py-2 animate-fade-in">
+                  <AIChat />
+                </div>
+              )}
               
               <div className="pt-4 pb-2">
                 <div className="px-3">
@@ -103,7 +131,7 @@ function NavItem({ to, icon, label }: NavItemProps) {
   return (
     <Link
       to={to}
-      className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+      className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-sidebar-foreground hover:bg-sidebar-accent transition-colors hover:scale-105 duration-300"
     >
       <span className="mr-3">{icon}</span>
       <span>{label}</span>
