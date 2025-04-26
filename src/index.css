@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -117,5 +116,9 @@
   
   .gradient-green {
     background: linear-gradient(135deg, #1ea896 0%, #3cc47c 100%);
+  }
+  
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
 }
