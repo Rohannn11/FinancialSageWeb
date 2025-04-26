@@ -184,6 +184,7 @@ export default function AnalyticsPage() {
               barKeys={["inflow", "outflow"]}
               barColors={["#4caf50", "#f44336"]}
               stacked={false}
+              dataKey="inflow" // Required prop, but barKeys will be used instead
             />
           </TabsContent>
           

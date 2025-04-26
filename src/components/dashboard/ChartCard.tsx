@@ -8,9 +8,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, AreaChart, Area } from "recharts";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  BarChart, 
+  Bar, 
+  AreaChart, 
+  Area, 
+  PieChart, 
+  Pie, 
+  Cell, 
+  Legend 
+} from "recharts";
 
-export type ChartType = "line" | "bar" | "area";
+export type ChartType = "line" | "bar" | "area" | "pie";
 
 interface ChartCardProps {
   title: string;
@@ -21,7 +37,13 @@ interface ChartCardProps {
   height?: number;
   color?: string;
   description?: string;
+  // Multiple series support for bar charts
+  barKeys?: string[];
+  barColors?: string[];
+  stacked?: boolean;
 }
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
 
 export function ChartCard({
   title,
@@ -32,6 +54,9 @@ export function ChartCard({
   height = 300,
   color = "#3282b8",
   description,
+  barKeys,
+  barColors,
+  stacked = false,
 }: ChartCardProps) {
   return (
     <Card className="shadow-card shadow-card-hover">
@@ -89,7 +114,7 @@ export function ChartCard({
               />
             </LineChart>
           ) : type === "bar" ? (
-            <BarChart data={data}>
+            <BarChart data={data} stackOffset={stacked ? "sign" : "none"}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis 
                 dataKey={xAxisKey} 
@@ -109,12 +134,44 @@ export function ChartCard({
                   boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" 
                 }} 
               />
-              <Bar 
-                dataKey={dataKey} 
-                fill={color} 
-                radius={[4, 4, 0, 0]} 
-              />
+              {barKeys && barKeys.length > 0 ? (
+                barKeys.map((key, index) => (
+                  <Bar 
+                    key={key}
+                    dataKey={key} 
+                    fill={barColors ? barColors[index % barColors.length] : COLORS[index % COLORS.length]} 
+                    stackId={stacked ? "stack" : undefined}
+                    radius={[4, 4, 0, 0]}
+                  />
+                ))
+              ) : (
+                <Bar 
+                  dataKey={dataKey} 
+                  fill={color} 
+                  radius={[4, 4, 0, 0]} 
+                />
+              )}
             </BarChart>
+          ) : type === "pie" ? (
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey={dataKey}
+                nameKey={xAxisKey}
+                cx="50%"
+                cy="50%"
+                outerRadius={height / 3}
+                fill={color}
+                labelLine={false}
+                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend />
+              <Tooltip />
+            </PieChart>
           ) : (
             <AreaChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

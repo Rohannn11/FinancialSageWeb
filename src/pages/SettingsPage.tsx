@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Display, Globe, Moon, PanelLeft, Sun } from "lucide-react";
+import { Bell, Globe, Moon, PanelLeft, Sun, Layout } from "lucide-react";
 
 export default function SettingsPage() {
   return (
@@ -18,7 +18,7 @@ export default function SettingsPage() {
         <Tabs defaultValue="appearance">
           <TabsList className="grid w-full md:w-auto grid-cols-2 md:grid-cols-4 gap-4">
             <TabsTrigger value="appearance">
-              <Display className="mr-2 h-4 w-4" />
+              <Layout className="mr-2 h-4 w-4" />
               Appearance
             </TabsTrigger>
             <TabsTrigger value="notifications">
