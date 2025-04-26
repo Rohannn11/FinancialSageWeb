@@ -58,11 +58,11 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           {/* Navigation */}
           <ScrollArea className="flex-1 py-4">
             <nav className="px-2 space-y-1">
-              <NavItem to="/" icon={<Home className="h-5 w-5" />} label="Dashboard" />
-              <NavItem to="/upload" icon={<UploadCloud className="h-5 w-5" />} label="Upload Data" />
-              <NavItem to="/reports" icon={<FileText className="h-5 w-5" />} label="Reports" />
+              <NavItem to="/dashboard" icon={<Home className="h-5 w-5" />} label="Dashboard" />
               <NavItem to="/analytics" icon={<BarChart3 className="h-5 w-5" />} label="Analytics" />
+              <NavItem to="/reports" icon={<FileText className="h-5 w-5" />} label="Reports" />
               <NavItem to="/forecasting" icon={<Calculator className="h-5 w-5" />} label="Forecasting" />
+              <NavItem to="/upload" icon={<UploadCloud className="h-5 w-5" />} label="Upload Data" />
               
               <div className="pt-4 pb-2">
                 <div className="px-3">
